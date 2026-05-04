@@ -1,0 +1,135 @@
+Base URL:
+http://localhost:8080
+
+1) Register CLIENT
+POST http://localhost:8080/api/auth/register
+Body:
+{
+  "fullName": "Client Test",
+  "email": "client@test.com",
+  "password": "123456",
+  "role": "CLIENT"
+}
+
+2) Register EMPLOYE
+POST http://localhost:8080/api/auth/register
+Body:
+{
+  "fullName": "Employe Test",
+  "email": "employe@test.com",
+  "password": "123456",
+  "role": "EMPLOYE",
+  "speciality": "Support technique"
+}
+
+3) Login CLIENT
+POST http://localhost:8080/api/auth/login
+Body:
+{
+  "email": "client@test.com",
+  "password": "123456"
+}
+
+Save the token as:
+TOKEN_CLIENT
+
+4) Login EMPLOYE
+POST http://localhost:8080/api/auth/login
+Body:
+{
+  "email": "employe@test.com",
+  "password": "123456"
+}
+
+Save the token as:
+TOKEN_EMPLOYE
+
+5) Get current client profile
+GET http://localhost:8080/api/users/me
+Header:
+Authorization: Bearer TOKEN_CLIENT
+
+6) Create task as CLIENT
+POST http://localhost:8080/api/tasks
+Header:
+Authorization: Bearer TOKEN_CLIENT
+Body:
+{
+  "title": "Repair computer",
+  "description": "The office computer does not start.",
+  "priority": "HAUTE",
+  "deadline": "2026-05-20"
+}
+
+Expected:
+201 Created
+status = EN_ATTENTE
+assignedToName = null
+
+7) Get my tasks as CLIENT
+GET http://localhost:8080/api/tasks/my-tasks
+Header:
+Authorization: Bearer TOKEN_CLIENT
+
+8) Get available tasks as EMPLOYE
+GET http://localhost:8080/api/tasks/available
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+
+9) Take task as EMPLOYE
+PUT http://localhost:8080/api/tasks/1/take
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+
+Expected:
+status = PRISE_EN_CHARGE
+assignedToName = Employe Test
+
+10) Get my assigned tasks as EMPLOYE
+GET http://localhost:8080/api/tasks/my-assigned-tasks
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+
+11) Update task status to EN_COURS
+PUT http://localhost:8080/api/tasks/1/status
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+Body:
+{
+  "status": "EN_COURS"
+}
+
+12) Close task
+PUT http://localhost:8080/api/tasks/1/close
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+
+Expected:
+status = TERMINEE
+
+13) Verify client sees final status
+GET http://localhost:8080/api/tasks/my-tasks
+Header:
+Authorization: Bearer TOKEN_CLIENT
+
+14) Negative test without token
+GET http://localhost:8080/api/tasks/my-tasks
+
+Expected:
+401 Unauthorized
+
+15) Negative test with wrong role
+Try:
+POST http://localhost:8080/api/tasks
+Header:
+Authorization: Bearer TOKEN_EMPLOYE
+
+Expected:
+403 Forbidden
+
+16) Negative test after JWT expiration
+Wait more than 5 minutes and call any protected endpoint.
+
+Expected:
+401 Unauthorized
+

@@ -1,0 +1,13 @@
+Java 17
+Maven
+IntelliJ IDEA
+MySQL Server
+MySQL database: taskflow_db
+Postman
+Spring Boot
+Spring Web
+Spring Data JPA
+Spring Security
+JWT
+Lombok
+
